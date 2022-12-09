@@ -1,38 +1,16 @@
 import numpy as np
 
-def move_rope(head,tail):
-    if (abs(head[0]-tail[0]) > 1) or (abs(head[1]-tail[1]) > 1):
-        hor_move = False
-        ver_move = False
-        if abs(head[0]-tail[0]) > 1:
-            tail[0] = (head[0]+tail[0])//2
-            hor_move = True
-        if (abs(head[1]-tail[1]) > 1):
-            tail[1] = (head[1]+tail[1])//2
-            ver_move = True
-        if abs(head[0]-tail[0]) == 1 and abs(head[0]-tail[0]) == 1: # we are still diagonal
-            if not hor_move:
-                tail[0] = head[0]
-            if not ver_move:
-                tail[1] = head[1]
-    return np.copy(head), np.copy(tail)
-
-def move_rope2(m,k):
-    knots = np.copy(k)
-    moves = {'R': [1,0],'L': [-1,0],'U': [0,1],'D': [0,-1]}
-    knots[0] += moves[m]
-    for i in range(knots.shape[0]-1):
-        knots[i:i+2] = move_rope(knots[i],knots[i+1])
-    return knots
-
 def make_rope(nknots):
-    knots = np.zeros((nknots,2))
-    #tail_positions = [(0,0)]
-    with open('data.txt','r') as file:
-        for step, l in enumerate(file):
-            for i in range(int(l[1:].strip())):
-                knots = move_rope2(l[0],knots)
-                tail_positions.append(tuple(knots[-1]))
-    return len(set(tail_positions))
+    knots = np.zeros((nknots,2))        # allocate knot positions
+    tail_positions = {(0,0)}            # start position of tail
+    with open('data.txt','r') as file:  # open file
+        for line in file:               # loop over instructions
+            for i in range(int(line[1:].strip())):   # loop over the number of times a step is to be taken
+                knots[0] += {'R': [1,0],'L': [-1,0],'U': [0,1],'D': [0,-1]}[line[0]] # move the head knot
+                for i in range(knots.shape[0]-1):                                    # loop over knots
+                    if (abs(knots[i,0]-knots[i+1,0]) > 1) or (abs(knots[i,1]-knots[i+1,1]) > 1): # test if rope is breaking
+                        knots[i+1] += np.clip(knots[i]-knots[i+1],-1,+1) # move tail knot accordingly. Max one move
+                tail_positions.add(tuple(knots[-1])) # add tail position to set
+    return len(tail_positions)                       # return length of set
 
 print("1st :", make_rope(2), "2nd :", make_rope(10))
