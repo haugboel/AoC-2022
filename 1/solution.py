@@ -8,7 +8,6 @@ with open('data.txt') as f:
             supply.append(s)
             s=0
         else:
-            k = int(l)
             s+=int(l)
 supply = np.array(supply)
 print('Max calories: ',np.argmax(supply)+1,max(supply))

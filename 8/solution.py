@@ -1,25 +1,24 @@
 import numpy as np
 
-data = []
 d = (open('data.txt','r')).readlines()
-for l in d:
-    data.append([int(i) for i in l.strip()])
-data = np.array(data)
-n = data.shape[0]
+n = len(d[0].strip())
+data = np.empty((n,n),int)
+for ix,line in enumerate(d):
+    for iy,char in enumerate(line.strip()):
+        data[ix,iy] = int(char)
 
-def clear(line,tree):
-    for i,l in enumerate(line):
-        if l>=tree:
+def clear(view,tree):
+    for i,t in enumerate(view):
+        if t>=tree:
             return i + 1
-    return line.shape[0]
+    return len(view)
 
 score = 0
-visible = n*2+(n-2)*2
-for ix in range(1,n-1):
-    for iy in range(1,n-1):
+visible = 0
+for ix in range(n):
+    for iy in range(n):
         views = [np.flip(data[0:ix,iy]), data[ix+1:,iy], np.flip(data[ix,0:iy]), data[ix,iy+1:]]
-        if np.any([np.all(v < data[ix,iy]) for v in views]):
-            visible += 1
+        visible += int(np.any([np.all(v < data[ix,iy]) for v in views]))
         score = max(score, np.prod([clear(v,data[ix,iy]) for v in views]))
 print('1st :', visible)
 print('2nd :', score)

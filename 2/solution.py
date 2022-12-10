@@ -5,7 +5,6 @@ score=0
 with open('data.txt') as f:
     for ll in f.readlines():
         l = ll.strip()
-        print(l)
         if l=='A X':
             score +=3+0
         if l=='A Y':
